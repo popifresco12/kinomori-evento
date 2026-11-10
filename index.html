@@ -63,6 +63,9 @@
   .ayuda{font-size:.78rem;color:rgba(248,241,230,.55);margin-top:6px}
   .fila{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   @media(max-width:460px){.fila{grid-template-columns:1fr}}
+  .tel{display:grid;grid-template-columns:104px 1fr;gap:10px}
+  .tel select{padding-left:10px}
+  .ayuda.error{color:var(--error)}
   .total{
     display:flex;justify-content:space-between;align-items:baseline;
     margin-top:22px;padding-top:18px;border-top:1px solid rgba(248,241,230,.14)
@@ -152,7 +155,12 @@
     <input id="email" name="email" type="email" autocomplete="email" required>
 
     <label for="telefono" data-i18n="telefono">Teléfono / WhatsApp</label>
-    <input id="telefono" name="telefono" type="tel" autocomplete="tel" inputmode="tel" required>
+    <div class="tel">
+      <select id="prefijo" aria-label="Prefijo"></select>
+      <input id="telefono" name="telefono" type="tel" autocomplete="tel-national"
+             inputmode="numeric" placeholder="600 000 000" required>
+    </div>
+    <div class="ayuda" id="tel-ayuda"></div>
 
     <label for="alergias" data-i18n="alergias">Alergias o intolerancias</label>
     <textarea id="alergias" name="alergias" data-i18n-placeholder="alergias_ph"
@@ -201,10 +209,10 @@
 
     <div id="bloque-paypal" class="oculto">
       <div class="moneda-nota" data-i18n="moneda_eur">PayPal no acepta dírhams: se paga en euros</div>
-      <div class="importe" id="importe-pp">32,41 €</div>
-      <div class="importe-eur" id="importe-pp-mad">≈ 350 MAD</div>
+      <div class="importe" id="importe-pp">35 €</div>
+      <div class="importe-eur" id="importe-pp-mad">1 persona</div>
       <div class="qr-caja">
-        <img id="qr-pp" src="paypal-qr.png" alt="QR de pago PayPal de Kinomori" width="220" height="220">
+        <img id="qr-pp" src="paypal-qr.jpg" alt="QR de pago PayPal de Kinomori" width="220" height="220">
       </div>
       <div>
         <a class="enlace-pago" id="enlace-pp" href="#" target="_blank" rel="noopener">
@@ -249,12 +257,14 @@ const CONFIG = {
 
   // Aforo
   plazasTotales: 15,
-  maxPersonasPorReserva: 6,
+  maxPersonasPorReserva: 15,   // tope = min(vacantes, esto)
 
   // Pago
   revolutLink: "https://revolut.me/carlosgzlz",
-  paypalMe: "daftcharly",      // paypal.me/daftcharly
-  paypalEmail: "daftcharly@gmail.com",
+  // PayPal: importe FIJO por persona en euros (no se convierte de MAD)
+  paypalPrecioPorPersona: 35,
+  paypalLink: "https://www.paypal.com/qrcodes/p2pqrc/UVJZLR6W4TCUU",
+  paypalQR: "paypal-qr.jpg",
   whatsapp: "34620467051",     // formato internacional SIN + ni espacios (ahora: móvil de Carlos)
   emailContacto: "carlosgonzvali@gmail.com",
 
@@ -280,6 +290,7 @@ const T = {
       moneda_mad:"Importe en dírhams (MAD)",moneda_eur:"PayPal no acepta dírhams: se paga en euros",
       plazas_libres:"{n} plazas disponibles",plaza_libre:"1 plaza disponible",agotado:"Aforo completo",
       falto:"Rellena todos los campos obligatorios.", bademail:"Revisa el email.",
+      telmalo:"El teléfono no es válido para {p}: deben ser {n} dígitos.",
       enviando:"Enviando…", fallo:"No se pudo enviar la reserva. Escríbenos por WhatsApp."},
   fr:{personas:"Nombre de personnes",nombre:"Prénom",apellidos:"Nom",email:"E-mail",
       telefono:"Téléphone / WhatsApp",alergias:"Allergies ou intolérances",
@@ -297,6 +308,7 @@ const T = {
       moneda_mad:"Montant en dirhams (MAD)",moneda_eur:"PayPal n'accepte pas les dirhams : paiement en euros",
       plazas_libres:"{n} places disponibles",plaza_libre:"1 place disponible",agotado:"Complet",
       falto:"Merci de remplir tous les champs obligatoires.", bademail:"Vérifiez l'e-mail.",
+      telmalo:"Numéro invalide pour {p} : {n} chiffres attendus.",
       enviando:"Envoi…", fallo:"Échec de l'envoi. Écrivez-nous sur WhatsApp."},
   en:{personas:"Number of guests",nombre:"First name",apellidos:"Last name",email:"Email",
       telefono:"Phone / WhatsApp",alergias:"Allergies or intolerances",
@@ -314,6 +326,7 @@ const T = {
       moneda_mad:"Amount in dirhams (MAD)",moneda_eur:"PayPal doesn't accept dirhams: you pay in euros",
       plazas_libres:"{n} seats left",plaza_libre:"1 seat left",agotado:"Sold out",
       falto:"Please fill in all required fields.", bademail:"Check the email.",
+      telmalo:"Invalid number for {p}: {n} digits expected.",
       enviando:"Sending…", fallo:"Could not send. Message us on WhatsApp."}
 };
 
@@ -353,12 +366,13 @@ function pintaImporte(){
   $("#importe-pago").textContent = mad + " " + CONFIG.moneda;
   $("#importe-eur").textContent = "≈ " + fmtEur(eur);
   $("#enlace-pago").href = CONFIG.revolutLink;
-  // PayPal: en euros (no acepta MAD)
-  $("#importe-pp").textContent = fmtEur(eur);
-  $("#importe-pp-mad").textContent = "≈ " + mad + " " + CONFIG.moneda;
-  $("#enlace-pp").href = CONFIG.paypalMe
-    ? "https://www.paypal.com/paypalme/" + CONFIG.paypalMe + "/" + eur.toFixed(2) + "EUR"
-    : "#";
+  // PayPal: importe fijo por persona, en euros
+  const nPers = parseInt($("#personas").value || "1", 10);
+  const pp = CONFIG.paypalPrecioPorPersona * nPers;
+  $("#importe-pp").textContent = fmtEur(pp);
+  $("#importe-pp-mad").textContent = nPers + (nPers === 1 ? " persona" : " personas")
+                                     + " × " + CONFIG.paypalPrecioPorPersona + " €";
+  $("#enlace-pp").href = CONFIG.paypalLink;
 }
 
 function pintaPlazas(){
@@ -368,6 +382,36 @@ function pintaPlazas(){
     : libres === 1 ? t.plaza_libre : t.plazas_libres.replace("{n}", libres);
   $("#punto").classList.toggle("agotado", libres === 0);
   if(libres === 0){ $("#form").classList.add("oculto"); }
+}
+
+/* ── teléfono: prefijos y longitud válida por país ── */
+const PREFIJOS = [
+  { p: "+212", n: "🇲🇦 Marruecos", min: 9, max: 9 },
+  { p: "+34",  n: "🇪🇸 España",    min: 9, max: 9 },
+  { p: "+33",  n: "🇫🇷 France",    min: 9, max: 9 },
+  { p: "+44",  n: "🇬🇧 UK",        min: 10, max: 10 },
+  { p: "+49",  n: "🇩🇪 DE",        min: 10, max: 11 },
+  { p: "+39",  n: "🇮🇹 IT",        min: 9,  max: 10 },
+  { p: "+31",  n: "🇳🇱 NL",        min: 9,  max: 9 },
+  { p: "+32",  n: "🇧🇪 BE",        min: 8,  max: 9 },
+  { p: "+351", n: "🇵🇹 PT",        min: 9,  max: 9 },
+  { p: "+1",   n: "🇺🇸 US/CA",     min: 10, max: 10 }
+];
+const reglaTel = () => PREFIJOS.find(x => x.p === $("#prefijo").value) || PREFIJOS[0];
+const soloDigitos = s => (s || "").replace(/\D/g, "");
+
+function pintaAyudaTel(){
+  const r = reglaTel();
+  const n = soloDigitos($("#telefono").value).length;
+  const el = $("#tel-ayuda");
+  el.textContent = r.p + " · " + (r.min === r.max ? r.min : r.min + "-" + r.max) + " dígitos";
+  el.classList.toggle("error", n > 0 && (n < r.min || n > r.max));
+}
+
+function telefonoValido(){
+  const r = reglaTel();
+  const n = soloDigitos($("#telefono").value).length;
+  return n >= r.min && n <= r.max;
 }
 
 /* ── arranque ── */
@@ -394,6 +438,18 @@ function pintaPlazas(){
       $("#bloque-paypal").classList.toggle("oculto", b.dataset.via !== "paypal");
     });
   });
+  // selector de prefijo
+  const sp = $("#prefijo");
+  PREFIJOS.forEach(x=>{
+    const o = document.createElement("option");
+    o.value = x.p; o.textContent = x.p + " " + x.n;
+    sp.appendChild(o);
+  });
+  sp.value = "+212";                       // Kinomori está en Marruecos
+  sp.addEventListener("change", ()=>{ pintaAyudaTel(); $("#telefono").focus(); });
+  $("#telefono").addEventListener("input", pintaAyudaTel);
+  pintaAyudaTel();
+
   pintaIdioma();
   // disponibilidad real si hay endpoint
   if(CONFIG.endpoint){
@@ -415,7 +471,8 @@ $("#form").addEventListener("submit", async e=>{
   const datos = {
     personas: $("#personas").value, nombre: $("#nombre").value.trim(),
     apellidos: $("#apellidos").value.trim(), email: $("#email").value.trim(),
-    telefono: $("#telefono").value.trim(), alergias: $("#alergias").value.trim(),
+    telefono: $("#prefijo").value + soloDigitos($("#telefono").value),
+    alergias: $("#alergias").value.trim(),
     importe: importe(), idioma, evento: "cena-especial"
   };
   const err = $("#error");
@@ -424,6 +481,12 @@ $("#form").addEventListener("submit", async e=>{
   }
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(datos.email)){
     err.textContent = t.bademail; err.classList.remove("oculto"); return;
+  }
+  if(!telefonoValido()){
+    const r = reglaTel();
+    err.textContent = t.telmalo.replace("{p}", r.p)
+      .replace("{n}", r.min === r.max ? r.min : r.min + "-" + r.max);
+    err.classList.remove("oculto"); return;
   }
   err.classList.add("oculto");
   const btn = $("#enviar");
@@ -447,6 +510,12 @@ $("#form").addEventListener("submit", async e=>{
   $("#form").classList.add("oculto");
   $("#pago").classList.remove("oculto");
   btn.disabled = false; btn.textContent = t.reservar;
+  // refrescar aforo real tras reservar
+  if(CONFIG.endpoint){
+    fetch(CONFIG.endpoint + "?accion=plazas").then(r=>r.json())
+      .then(d=>{ if(typeof d.reservadas === "number"){ window.__reservadas = d.reservadas; pintaPlazas(); } })
+      .catch(()=>{});
+  }
   window.scrollTo({top:0, behavior:"smooth"});
 });
 </script>
