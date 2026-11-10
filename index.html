@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kinomori · Cena especial — Reserva</title>
-<meta name="description" content="Reserva tu plaza para la cena especial de Kinomori. Aforo limitado.">
-<meta property="og:title" content="Kinomori · Cena especial">
-<meta property="og:description" content="Aforo limitado. Reserva tu plaza y confirma con el pago.">
+<title>Kinomori · Autumn Table — Reserva</title>
+<meta name="description" content="Autumn Table · Mesa de otoño en Kinomori. Aforo limitado, reserva tu plaza.">
+<meta property="og:title" content="Kinomori · Autumn Table">
+<meta property="og:description" content="Autumn Table · Mesa de otoño. Aforo limitado: reserva tu plaza y confirma con el pago.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2314100c'/%3E%3Ctext x='16' y='23' font-size='18' text-anchor='middle' fill='%23ff7a3d' font-family='Georgia'%3EK%3C/text%3E%3C/svg%3E">
 <style>
@@ -33,6 +33,10 @@
   h1{font-size:clamp(1.9rem,7vw,2.7rem);line-height:1.15;font-weight:400;letter-spacing:-.01em}
   h1 em{font-style:normal;color:var(--naranja)}
   .fecha{margin-top:12px;font-size:1.02rem;color:var(--lila)}
+  .subtitulo{
+    margin-top:6px;font-size:.95rem;color:var(--salmon);font-style:italic;letter-spacing:.04em
+  }
+  .subtitulo:empty{display:none}
   .idiomas{display:flex;gap:6px;justify-content:center;margin-top:18px}
   .idiomas button{
     background:transparent;border:1px solid rgba(238,230,255,.28);color:var(--crema);
@@ -121,7 +125,8 @@
 
   <header>
     <div class="marca">Kinomori · Tamraght</div>
-    <h1 id="titulo">Cena <em>especial</em></h1>
+    <h1 id="titulo">Autumn <em>Table</em></h1>
+    <div class="subtitulo" id="subtitulo"></div>
     <div class="fecha" id="fecha"></div>
     <div class="idiomas" role="group" aria-label="Idioma">
       <button data-idioma="es" aria-pressed="true">ES</button>
@@ -275,7 +280,7 @@ const CONFIG = {
 
 /* ── textos ── */
 const T = {
-  es:{personas:"Número de personas",nombre:"Nombre",apellidos:"Apellidos",email:"Email",
+  es:{subtitulo:"Mesa de otoño",personas:"Número de personas",nombre:"Nombre",apellidos:"Apellidos",email:"Email",
       telefono:"Teléfono / WhatsApp",alergias:"Alergias o intolerancias",
       alergias_ph:"Ej.: frutos secos, gluten, lactosa, vegetariano… Déjalo vacío si no hay ninguna.",
       alergias_ayuda:"Nos importa de verdad: lo pasamos a cocina antes del evento.",
@@ -294,7 +299,7 @@ const T = {
       telmalo:"El teléfono no es válido para {p}: deben ser {n} dígitos.",
       persona_n:"Persona {n} — nombre y apellidos",nombre_ph:"Nombre y apellidos",
       enviando:"Enviando…", fallo:"No se pudo enviar la reserva. Escríbenos por WhatsApp."},
-  fr:{personas:"Nombre de personnes",nombre:"Prénom",apellidos:"Nom",email:"E-mail",
+  fr:{subtitulo:"Table d'automne",personas:"Nombre de personnes",nombre:"Prénom",apellidos:"Nom",email:"E-mail",
       telefono:"Téléphone / WhatsApp",alergias:"Allergies ou intolérances",
       alergias_ph:"Ex. : fruits à coque, gluten, lactose, végétarien… Laissez vide si aucune.",
       alergias_ayuda:"C'est important pour nous : transmis en cuisine avant l'événement.",
@@ -313,7 +318,7 @@ const T = {
       telmalo:"Numéro invalide pour {p} : {n} chiffres attendus.",
       persona_n:"Personne {n} — prénom et nom",nombre_ph:"Prénom et nom",
       enviando:"Envoi…", fallo:"Échec de l'envoi. Écrivez-nous sur WhatsApp."},
-  en:{personas:"Number of guests",nombre:"First name",apellidos:"Last name",email:"Email",
+  en:{subtitulo:"",personas:"Number of guests",nombre:"First name",apellidos:"Last name",email:"Email",
       telefono:"Phone / WhatsApp",alergias:"Allergies or intolerances",
       alergias_ph:"E.g. nuts, gluten, lactose, vegetarian… Leave empty if none.",
       alergias_ayuda:"We take this seriously: it goes to the kitchen before the event.",
@@ -355,6 +360,7 @@ function pintaIdioma(){
     b.setAttribute("aria-pressed", b.dataset.idioma === idioma ? "true" : "false");
   });
   $("#fecha").textContent = CONFIG.fechaTexto[idioma] || CONFIG.fechaTexto.es;
+  $("#subtitulo").textContent = t.subtitulo || "";
   pintaPlazas(); pintaImporte(); pintaAcompanantes();
 }
 
@@ -493,7 +499,7 @@ $("#form").addEventListener("submit", async e=>{
     telefono: $("#prefijo").value + soloDigitos($("#telefono").value),
     acompanantes: Array.from(document.querySelectorAll(".acomp")).map(i => i.value.trim()),
     alergias: $("#alergias").value.trim(),
-    importe: importe(), idioma, evento: "cena-especial"
+    importe: importe(), idioma, evento: "autumn-table"
   };
   const err = $("#error");
   if(!datos.nombre || !datos.apellidos || !datos.email || !datos.telefono){

@@ -104,7 +104,7 @@ function doPost(e) {
       d.nombre || "", d.apellidos || "", piden,
       d.importe || "", "NO",
       d.email || "", "'" + (d.telefono || ""),   // apóstrofo: que no lo coma como número
-      d.alergias || "", d.idioma || "", d.evento || "cena-especial",
+      d.alergias || "", d.idioma || "", d.evento || "autumn-table",
       Array.isArray(d.acompanantes) ? d.acompanantes.join(" / ") : (d.acompanantes || "")
     ]);
 
