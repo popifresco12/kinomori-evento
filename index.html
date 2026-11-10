@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kinomori · The Autumn Table — Reserva</title>
-<meta name="description" content="The Autumn Table at Kinomori. Limited seats — book yours.">
-<meta property="og:title" content="Kinomori · The Autumn Table">
-<meta property="og:description" content="The Autumn Table at Kinomori. Limited seats — book yours and confirm with payment.">
+<title>Kinomori x Chimi · The Autumn Table — Tamraght</title>
+<meta name="description" content="The Autumn Table · Kinomori x Chimi, Tamraght (Morocco). Limited seats — book yours.">
+<meta property="og:title" content="Kinomori x Chimi · The Autumn Table">
+<meta property="og:description" content="The Autumn Table · Kinomori x Chimi, Tamraght (Morocco). Limited seats — book yours and confirm with payment.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2314100c'/%3E%3Ctext x='16' y='23' font-size='18' text-anchor='middle' fill='%23ff7a3d' font-family='Georgia'%3EK%3C/text%3E%3C/svg%3E">
 <style>
@@ -37,6 +37,10 @@
     margin-top:6px;font-size:.95rem;color:var(--salmon);font-style:italic;letter-spacing:.04em
   }
   .subtitulo:empty{display:none}
+  .lugar{
+    margin-top:14px;font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;
+    color:rgba(248,241,230,.6)
+  }
   .idiomas{display:flex;gap:6px;justify-content:center;margin-top:18px}
   .idiomas button{
     background:transparent;border:1px solid rgba(238,230,255,.28);color:var(--crema);
@@ -44,6 +48,38 @@
     letter-spacing:.06em;transition:.18s
   }
   .idiomas button[aria-pressed="true"]{background:var(--crema);color:var(--carbon);border-color:var(--crema)}
+  .btn-menu{
+    display:block;margin:0 auto 22px;padding:11px 24px;border-radius:999px;
+    background:transparent;border:1px solid rgba(255,122,61,.55);color:var(--melocoton);
+    font-family:var(--serif);font-size:.92rem;letter-spacing:.07em;cursor:pointer;transition:.18s
+  }
+  .btn-menu:hover{background:rgba(255,122,61,.13)}
+  /* ── popup del menú ── */
+  .modal{
+    position:fixed;inset:0;z-index:60;background:rgba(12,9,6,.86);
+    display:flex;align-items:flex-start;justify-content:center;
+    padding:26px 16px 40px;overflow-y:auto;-webkit-overflow-scrolling:touch
+  }
+  .modal-caja{
+    position:relative;background:var(--crema);color:#3a2a1c;border-radius:18px;
+    max-width:520px;width:100%;padding:38px 24px 26px;box-shadow:0 22px 70px rgba(0,0,0,.55)
+  }
+  .cerrar{
+    position:absolute;top:8px;right:10px;background:transparent;border:none;
+    font-size:2rem;line-height:1;color:#8a6a52;cursor:pointer;padding:4px 10px;border-radius:8px
+  }
+  .cerrar:hover{background:rgba(138,106,82,.12)}
+  .menu-cab{text-align:center;margin-bottom:24px}
+  .menu-cab h2{font-size:1.9rem;letter-spacing:.26em;color:#c1440e;font-weight:400;margin-bottom:8px}
+  .menu-cab p{font-size:.74rem;letter-spacing:.15em;text-transform:uppercase;color:#8a6a52;line-height:1.6}
+  .menu-sec{text-align:center;margin-bottom:21px}
+  .menu-sec .zh{font-family:var(--jp);font-size:1.02rem;color:#c1440e;letter-spacing:.14em;margin-bottom:3px}
+  .menu-sec .t{font-size:1.03rem;color:#3a2a1c;line-height:1.35}
+  .menu-sec .d{font-size:.87rem;color:#6b5140;margin-top:4px;line-height:1.45}
+  .menu-original{
+    display:block;text-align:center;margin-top:10px;font-size:.78rem;
+    color:#8a6a52;text-decoration:underline
+  }
   .plazas{
     display:flex;align-items:center;justify-content:center;gap:10px;
     background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);
@@ -124,16 +160,34 @@
 <div class="wrap">
 
   <header>
-    <div class="marca">Kinomori · Tamraght</div>
+    <div class="marca">Kinomori x Chimi</div>
     <h1 id="titulo">The Autumn <em>Table</em></h1>
     <div class="subtitulo" id="subtitulo"></div>
     <div class="fecha" id="fecha"></div>
-    <div class="idiomas" role="group" aria-label="Idioma">
-      <button data-idioma="es" aria-pressed="true">ES</button>
+    <div class="lugar">Tamraght, Morocco</div>
+    <div class="idiomas" role="group" aria-label="Language">
+      <button data-idioma="en" aria-pressed="true">EN</button>
+      <button data-idioma="es" aria-pressed="false">ES</button>
       <button data-idioma="fr" aria-pressed="false">FR</button>
-      <button data-idioma="en" aria-pressed="false">EN</button>
     </div>
   </header>
+
+  <button class="btn-menu" type="button" id="abrir-menu" data-i18n="ver_menu">View the menu</button>
+
+  <!-- ─────────────  POPUP DEL MENÚ  ───────────── -->
+  <div class="modal oculto" id="menu-modal" role="dialog" aria-modal="true" aria-labelledby="menu-h2">
+    <div class="modal-caja">
+      <button class="cerrar" type="button" id="menu-cerrar" aria-label="Close">×</button>
+      <div class="menu-cab">
+        <h2 id="menu-h2">MENU</h2>
+        <p>The Autumn Table<br>Kinomori x Chimi · Tamraght, Morocco</p>
+      </div>
+      <div id="menu-cuerpo"></div>
+      <a class="menu-original" href="menu.jpg" target="_blank" rel="noopener" data-i18n="menu_original">
+        See the original menu card
+      </a>
+    </div>
+  </div>
 
   <div class="plazas">
     <span class="punto" id="punto"></span>
@@ -245,7 +299,7 @@
     </div>
   </section>
 
-  <footer>Kinomori · Tamraght, Marruecos</footer>
+  <footer>Kinomori x Chimi · Tamraght, Morocco</footer>
 </div>
 
 <script>
@@ -297,6 +351,7 @@ const T = {
       plazas_libres:"{n} plazas disponibles",plaza_libre:"1 plaza disponible",agotado:"Aforo completo",
       falto:"Rellena todos los campos obligatorios.", bademail:"Revisa el email.",
       telmalo:"El teléfono no es válido para {p}: deben ser {n} dígitos.",
+      ver_menu:"Ver el menú",menu_original:"Ver la carta original",
       persona_n:"Persona {n} — nombre y apellidos",nombre_ph:"Nombre y apellidos",
       enviando:"Enviando…", fallo:"No se pudo enviar la reserva. Escríbenos por WhatsApp."},
   fr:{subtitulo:"La table d'automne",personas:"Nombre de personnes",nombre:"Prénom",apellidos:"Nom",email:"E-mail",
@@ -316,6 +371,7 @@ const T = {
       plazas_libres:"{n} places disponibles",plaza_libre:"1 place disponible",agotado:"Complet",
       falto:"Merci de remplir tous les champs obligatoires.", bademail:"Vérifiez l'e-mail.",
       telmalo:"Numéro invalide pour {p} : {n} chiffres attendus.",
+      ver_menu:"Voir le menu",menu_original:"Voir la carte originale",
       persona_n:"Personne {n} — prénom et nom",nombre_ph:"Prénom et nom",
       enviando:"Envoi…", fallo:"Échec de l'envoi. Écrivez-nous sur WhatsApp."},
   en:{subtitulo:"",personas:"Number of guests",nombre:"First name",apellidos:"Last name",email:"Email",
@@ -335,6 +391,7 @@ const T = {
       plazas_libres:"{n} seats left",plaza_libre:"1 seat left",agotado:"Sold out",
       falto:"Please fill in all required fields.", bademail:"Check the email.",
       telmalo:"Invalid number for {p}: {n} digits expected.",
+      ver_menu:"View the menu",menu_original:"See the original menu card",
       persona_n:"Guest {n} — full name",nombre_ph:"Full name",
       enviando:"Sending…", fallo:"Could not send. Message us on WhatsApp."}
 };
@@ -360,6 +417,7 @@ function pintaIdioma(){
   });
   $("#fecha").textContent = CONFIG.fechaTexto[idioma] || CONFIG.fechaTexto.es;
   $("#subtitulo").textContent = t.subtitulo || "";
+  pintaMenu();
   pintaPlazas(); pintaImporte(); pintaAcompanantes();
 }
 
@@ -388,6 +446,48 @@ function pintaPlazas(){
     : libres === 1 ? t.plaza_libre : t.plazas_libres.replace("{n}", libres);
   $("#punto").classList.toggle("agotado", libres === 0);
   if(libres === 0){ $("#form").classList.add("oculto"); }
+}
+
+/* ── carta del evento ── */
+const MENU = {
+  en: [
+    { zh: "前菜", t: "Appetizers", d: "5 appetizers from 5 elements<br>Metal · Wood · Water · Fire · Earth" },
+    { zh: "净素汤", t: "Mushroom &amp; Peas Soup", d: "" },
+    { zh: "素包", t: "Bao", d: "Yuxiang aubergine &amp; veggie" },
+    { zh: "南瓜八宝饭", t: "Pumpkin Babao Mixed Sticky Rice", d: "" },
+    { zh: "小吊梨汤", t: "Slow simmered Pear", d: "with goji berry, lotus seeds, lilybulb, date" },
+    { zh: "茶", t: "Teas", d: "Anji White Tea · Phoenix Dancong oolong · Mandarin Pu'erh" }
+  ],
+  es: [
+    { zh: "前菜", t: "Aperitivos", d: "5 aperitivos de los 5 elementos<br>Metal · Madera · Agua · Fuego · Tierra" },
+    { zh: "净素汤", t: "Sopa de setas y guisantes", d: "" },
+    { zh: "素包", t: "Bao", d: "Berenjena al estilo Yuxiang y verduras" },
+    { zh: "南瓜八宝饭", t: "Arroz glutinoso Babao con calabaza", d: "" },
+    { zh: "小吊梨汤", t: "Pera cocida a fuego lento", d: "con bayas de goji, semillas de loto, bulbo de lirio y dátil" },
+    { zh: "茶", t: "Tés", d: "Té blanco de Anji · Oolong Dancong Fénix · Pu'erh de mandarina" }
+  ],
+  fr: [
+    { zh: "前菜", t: "Entrées", d: "5 entrées des 5 éléments<br>Métal · Bois · Eau · Feu · Terre" },
+    { zh: "净素汤", t: "Soupe de champignons et petits pois", d: "" },
+    { zh: "素包", t: "Bao", d: "Aubergine au yuxiang et légumes" },
+    { zh: "南瓜八宝饭", t: "Riz gluant Babao au potiron", d: "" },
+    { zh: "小吊梨汤", t: "Poire mijotée lentement", d: "avec baies de goji, graines de lotus, bulbe de lys et datte" },
+    { zh: "茶", t: "Thés", d: "Thé blanc d'Anji · Oolong Dancong Phénix · Pu'erh à la mandarine" }
+  ]
+};
+
+function pintaMenu(){
+  const cont = $("#menu-cuerpo");
+  if (!cont) return;
+  cont.innerHTML = "";
+  (MENU[idioma] || MENU.en).forEach(s => {
+    const d = document.createElement("div");
+    d.className = "menu-sec";
+    d.innerHTML = '<div class="zh">' + s.zh + '</div>'
+                + '<div class="t">' + s.t + '</div>'
+                + (s.d ? '<div class="d">' + s.d + '</div>' : '');
+    cont.appendChild(d);
+  });
 }
 
 /* ── nombres de todos los asistentes ── */
@@ -462,6 +562,21 @@ function telefonoValido(){
       $("#bloque-paypal").classList.toggle("oculto", b.dataset.via !== "paypal");
     });
   });
+  // popup del menú
+  const abrirMenu = ()=>{
+    pintaMenu();
+    $("#menu-modal").classList.remove("oculto");
+    document.body.style.overflow = "hidden";
+  };
+  const cerrarMenu = ()=>{
+    $("#menu-modal").classList.add("oculto");
+    document.body.style.overflow = "";
+  };
+  $("#abrir-menu").addEventListener("click", abrirMenu);
+  $("#menu-cerrar").addEventListener("click", cerrarMenu);
+  $("#menu-modal").addEventListener("click", e => { if (e.target.id === "menu-modal") cerrarMenu(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") cerrarMenu(); });
+
   // selector de prefijo
   const sp = $("#prefijo");
   PREFIJOS.forEach(x=>{
