@@ -151,6 +151,8 @@
       </div>
     </div>
 
+    <div id="acompanantes"></div>
+
     <label for="email" data-i18n="email">Email</label>
     <input id="email" name="email" type="email" autocomplete="email" required>
 
@@ -261,8 +263,7 @@ const CONFIG = {
 
   // Pago
   revolutLink: "https://revolut.me/carlosgzlz",
-  // PayPal: importe FIJO por persona en euros (no se convierte de MAD)
-  paypalPrecioPorPersona: 35,
+  // PayPal cobra en euros: mismo precio (350 MAD) convertido
   paypalLink: "https://www.paypal.com/qrcodes/p2pqrc/UVJZLR6W4TCUU",
   paypalQR: "paypal-qr.jpg",
   whatsapp: "34620467051",     // formato internacional SIN + ni espacios (ahora: móvil de Carlos)
@@ -291,6 +292,7 @@ const T = {
       plazas_libres:"{n} plazas disponibles",plaza_libre:"1 plaza disponible",agotado:"Aforo completo",
       falto:"Rellena todos los campos obligatorios.", bademail:"Revisa el email.",
       telmalo:"El teléfono no es válido para {p}: deben ser {n} dígitos.",
+      persona_n:"Persona {n} — nombre y apellidos",nombre_ph:"Nombre y apellidos",
       enviando:"Enviando…", fallo:"No se pudo enviar la reserva. Escríbenos por WhatsApp."},
   fr:{personas:"Nombre de personnes",nombre:"Prénom",apellidos:"Nom",email:"E-mail",
       telefono:"Téléphone / WhatsApp",alergias:"Allergies ou intolérances",
@@ -309,6 +311,7 @@ const T = {
       plazas_libres:"{n} places disponibles",plaza_libre:"1 place disponible",agotado:"Complet",
       falto:"Merci de remplir tous les champs obligatoires.", bademail:"Vérifiez l'e-mail.",
       telmalo:"Numéro invalide pour {p} : {n} chiffres attendus.",
+      persona_n:"Personne {n} — prénom et nom",nombre_ph:"Prénom et nom",
       enviando:"Envoi…", fallo:"Échec de l'envoi. Écrivez-nous sur WhatsApp."},
   en:{personas:"Number of guests",nombre:"First name",apellidos:"Last name",email:"Email",
       telefono:"Phone / WhatsApp",alergias:"Allergies or intolerances",
@@ -327,6 +330,7 @@ const T = {
       plazas_libres:"{n} seats left",plaza_libre:"1 seat left",agotado:"Sold out",
       falto:"Please fill in all required fields.", bademail:"Check the email.",
       telmalo:"Invalid number for {p}: {n} digits expected.",
+      persona_n:"Guest {n} — full name",nombre_ph:"Full name",
       enviando:"Sending…", fallo:"Could not send. Message us on WhatsApp."}
 };
 
@@ -351,7 +355,7 @@ function pintaIdioma(){
     b.setAttribute("aria-pressed", b.dataset.idioma === idioma ? "true" : "false");
   });
   $("#fecha").textContent = CONFIG.fechaTexto[idioma] || CONFIG.fechaTexto.es;
-  pintaPlazas(); pintaImporte();
+  pintaPlazas(); pintaImporte(); pintaAcompanantes();
 }
 
 const fmtEur = v => v.toFixed(2).replace(".", ",") + " €";
@@ -366,12 +370,9 @@ function pintaImporte(){
   $("#importe-pago").textContent = mad + " " + CONFIG.moneda;
   $("#importe-eur").textContent = "≈ " + fmtEur(eur);
   $("#enlace-pago").href = CONFIG.revolutLink;
-  // PayPal: importe fijo por persona, en euros
-  const nPers = parseInt($("#personas").value || "1", 10);
-  const pp = CONFIG.paypalPrecioPorPersona * nPers;
-  $("#importe-pp").textContent = fmtEur(pp);
-  $("#importe-pp-mad").textContent = nPers + (nPers === 1 ? " persona" : " personas")
-                                     + " × " + CONFIG.paypalPrecioPorPersona + " €";
+  // PayPal: mismo precio, mostrado en euros
+  $("#importe-pp").textContent = fmtEur(eur);
+  $("#importe-pp-mad").textContent = "≈ " + mad + " " + CONFIG.moneda;
   $("#enlace-pp").href = CONFIG.paypalLink;
 }
 
@@ -382,6 +383,24 @@ function pintaPlazas(){
     : libres === 1 ? t.plaza_libre : t.plazas_libres.replace("{n}", libres);
   $("#punto").classList.toggle("agotado", libres === 0);
   if(libres === 0){ $("#form").classList.add("oculto"); }
+}
+
+/* ── nombres de todos los asistentes ── */
+function pintaAcompanantes(){
+  const n = parseInt($("#personas").value || "1", 10);
+  const cont = $("#acompanantes");
+  const previos = Array.from(cont.querySelectorAll(".acomp")).map(i => i.value);
+  cont.innerHTML = "";
+  for (let i = 2; i <= n; i++){
+    const lab = document.createElement("label");
+    lab.textContent = (T[idioma].persona_n || "Persona {n}").replace("{n}", i);
+    const inp = document.createElement("input");
+    inp.type = "text"; inp.className = "acomp"; inp.required = true;
+    inp.value = previos[i - 2] || "";
+    inp.placeholder = T[idioma].nombre_ph || "";
+    inp.autocomplete = "off";
+    cont.appendChild(lab); cont.appendChild(inp);
+  }
 }
 
 /* ── teléfono: prefijos y longitud válida por país ── */
@@ -424,7 +443,7 @@ function telefonoValido(){
     o.value = i; o.textContent = i + (i === 1 ? "" : " ×");
     sel.appendChild(o);
   }
-  sel.addEventListener("change", pintaImporte);
+  sel.addEventListener("change", ()=>{ pintaImporte(); pintaAcompanantes(); });
   document.querySelectorAll(".idiomas button").forEach(b=>{
     b.addEventListener("click", ()=>{ idioma = b.dataset.idioma; pintaIdioma(); });
   });
@@ -472,6 +491,7 @@ $("#form").addEventListener("submit", async e=>{
     personas: $("#personas").value, nombre: $("#nombre").value.trim(),
     apellidos: $("#apellidos").value.trim(), email: $("#email").value.trim(),
     telefono: $("#prefijo").value + soloDigitos($("#telefono").value),
+    acompanantes: Array.from(document.querySelectorAll(".acomp")).map(i => i.value.trim()),
     alergias: $("#alergias").value.trim(),
     importe: importe(), idioma, evento: "cena-especial"
   };
@@ -481,6 +501,9 @@ $("#form").addEventListener("submit", async e=>{
   }
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(datos.email)){
     err.textContent = t.bademail; err.classList.remove("oculto"); return;
+  }
+  if(datos.acompanantes.length && datos.acompanantes.some(n => !n)){
+    err.textContent = t.falto; err.classList.remove("oculto"); return;
   }
   if(!telefonoValido()){
     const r = reglaTel();

@@ -32,7 +32,7 @@ var PLAZAS_TOTALES = 15;
 var EMAIL_AVISO = "carlosgonzvali@gmail.com"; // te llega un email por reserva
 
 var CABECERAS = ["Fecha reserva","Nombre","Apellidos","Personas","Importe MAD",
-                 "Pagado","Email","Teléfono","Alergias","Idioma","Evento"];
+                 "Pagado","Email","Teléfono","Alergias","Idioma","Evento","Acompañantes"];
 
 /** Crea la hoja con cabeceras si no existe. Ejecuta esto UNA vez. */
 function setup() {
@@ -104,7 +104,8 @@ function doPost(e) {
       d.nombre || "", d.apellidos || "", piden,
       d.importe || "", "NO",
       d.email || "", "'" + (d.telefono || ""),   // apóstrofo: que no lo coma como número
-      d.alergias || "", d.idioma || "", d.evento || "cena-especial"
+      d.alergias || "", d.idioma || "", d.evento || "cena-especial",
+      Array.isArray(d.acompanantes) ? d.acompanantes.join(" / ") : (d.acompanantes || "")
     ]);
 
     // aviso por email (opcional pero recomendado)
