@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kinomori · Cena especial — Reserva</title>
+<meta name="description" content="Reserva tu plaza para la cena especial de Kinomori. Aforo limitado.">
+<meta property="og:title" content="Kinomori · Cena especial">
+<meta property="og:description" content="Aforo limitado. Reserva tu plaza y confirma con el pago.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2314100c'/%3E%3Ctext x='16' y='23' font-size='18' text-anchor='middle' fill='%23ff7a3d' font-family='Georgia'%3EK%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --morado:#8900ff; --naranja:#ff7a3d; --crema:#f8f1e6; --carbon:#14100c;
+    --carbon2:#1f1a15; --lila:#eee6ff; --melocoton:#ffb185; --salmon:#f3a08a;
+    --ok:#4ade80; --error:#ff6b6b;
+    --serif: Georgia, "Times New Roman", serif;
+    --jp: "Noto Serif JP", "Hiragino Mincho ProN", serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:var(--serif); background:var(--carbon); color:var(--crema);
+    min-height:100vh; line-height:1.6;
+    background-image:
+      radial-gradient(90vw 60vh at 85% -10%, rgba(137,0,255,.30), transparent 60%),
+      radial-gradient(70vw 50vh at 10% 110%, rgba(255,122,61,.20), transparent 60%);
+    background-attachment:fixed;
+  }
+  .wrap{max-width:640px;margin:0 auto;padding:28px 20px 64px}
+  header{text-align:center;margin-bottom:26px}
+  .marca{font-size:.72rem;letter-spacing:.34em;text-transform:uppercase;color:var(--melocoton);margin-bottom:14px}
+  h1{font-size:clamp(1.9rem,7vw,2.7rem);line-height:1.15;font-weight:400;letter-spacing:-.01em}
+  h1 em{font-style:normal;color:var(--naranja)}
+  .fecha{margin-top:12px;font-size:1.02rem;color:var(--lila)}
+  .idiomas{display:flex;gap:6px;justify-content:center;margin-top:18px}
+  .idiomas button{
+    background:transparent;border:1px solid rgba(238,230,255,.28);color:var(--crema);
+    font-family:var(--serif);font-size:.78rem;padding:5px 12px;border-radius:999px;cursor:pointer;
+    letter-spacing:.06em;transition:.18s
+  }
+  .idiomas button[aria-pressed="true"]{background:var(--crema);color:var(--carbon);border-color:var(--crema)}
+  .plazas{
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);
+    border-radius:14px;padding:12px 16px;margin-bottom:24px;font-size:.94rem
+  }
+  .punto{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 12px var(--ok);flex:none}
+  .punto.agotado{background:var(--error);box-shadow:0 0 12px var(--error)}
+  .tarjeta{
+    background:rgba(248,241,230,.045);border:1px solid rgba(248,241,230,.11);
+    border-radius:20px;padding:26px 22px;backdrop-filter:blur(6px)
+  }
+  label{display:block;font-size:.85rem;letter-spacing:.05em;color:var(--melocoton);margin:18px 0 7px;text-transform:uppercase}
+  label:first-of-type{margin-top:0}
+  input,select,textarea{
+    width:100%;padding:13px 14px;border-radius:11px;font-family:var(--serif);font-size:1rem;
+    background:rgba(20,16,12,.72);border:1px solid rgba(248,241,230,.20);color:var(--crema);
+    transition:.18s
+  }
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--naranja);box-shadow:0 0 0 3px rgba(255,122,61,.18)}
+  textarea{resize:vertical;min-height:74px}
+  .ayuda{font-size:.78rem;color:rgba(248,241,230,.55);margin-top:6px}
+  .fila{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:460px){.fila{grid-template-columns:1fr}}
+  .total{
+    display:flex;justify-content:space-between;align-items:baseline;
+    margin-top:22px;padding-top:18px;border-top:1px solid rgba(248,241,230,.14)
+  }
+  .total span:first-child{font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;color:var(--melocoton)}
+  .total .cifra{font-size:1.75rem;color:var(--naranja);font-weight:400}
+  .total .eur{font-size:.82rem;color:rgba(248,241,230,.55);display:block;text-align:right;margin-top:2px}
+  .boton{
+    display:block;width:100%;margin-top:22px;padding:16px;border:none;border-radius:13px;
+    background:linear-gradient(135deg,var(--naranja),var(--morado));color:#fff;
+    font-family:var(--serif);font-size:1.05rem;letter-spacing:.03em;cursor:pointer;transition:.2s
+  }
+  .boton:hover{filter:brightness(1.08);transform:translateY(-1px)}
+  .boton:disabled{opacity:.55;cursor:not-allowed;transform:none}
+  .nota{margin-top:16px;font-size:.8rem;color:rgba(248,241,230,.55);text-align:center;line-height:1.5}
+  .oculto{display:none !important}
+  .vias{display:flex;gap:8px;justify-content:center;margin:18px 0 22px}
+  .via{
+    flex:1;max-width:170px;padding:11px 8px;border-radius:11px;cursor:pointer;
+    background:transparent;border:1px solid rgba(248,241,230,.22);color:var(--crema);
+    font-family:var(--serif);font-size:.95rem;letter-spacing:.02em;transition:.18s
+  }
+  .via.activa{background:linear-gradient(135deg,var(--naranja),var(--morado));border-color:transparent;color:#fff}
+  .moneda-nota{font-size:.76rem;color:rgba(248,241,230,.5);margin-bottom:4px}
+  /* pantalla de pago */
+  .pago{text-align:center}
+  .pago h2{font-size:1.5rem;font-weight:400;margin-bottom:8px}
+  .pago .importe{
+    font-size:2.6rem;color:var(--naranja);margin:16px 0 4px;line-height:1
+  }
+  .pago .importe-eur{font-size:.9rem;color:rgba(248,241,230,.6);margin-bottom:22px}
+  .qr-caja{
+    background:var(--crema);border-radius:16px;padding:14px;display:inline-block;margin:6px 0 14px
+  }
+  .qr-caja img{display:block;width:220px;height:220px;image-rendering:pixelated}
+  .enlace-pago{
+    display:inline-block;margin:6px 0 18px;padding:12px 22px;border-radius:11px;
+    border:1px solid var(--naranja);color:var(--naranja);text-decoration:none;font-size:.95rem
+  }
+  .pasos{text-align:left;background:rgba(255,255,255,.045);border-radius:14px;padding:18px 20px;margin-top:8px}
+  .pasos ol{margin-left:18px;font-size:.92rem}
+  .pasos li{margin-bottom:8px}
+  .aviso{
+    margin-top:18px;padding:13px 16px;border-radius:12px;font-size:.85rem;
+    background:rgba(255,122,61,.10);border:1px solid rgba(255,122,61,.28);color:var(--melocoton)
+  }
+  .error-msg{color:var(--error);font-size:.88rem;margin-top:12px;text-align:center}
+  footer{text-align:center;margin-top:34px;font-size:.76rem;color:rgba(248,241,230,.35);letter-spacing:.05em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="marca">Kinomori · Tamraght</div>
+    <h1 id="titulo">Cena <em>especial</em></h1>
+    <div class="fecha" id="fecha"></div>
+    <div class="idiomas" role="group" aria-label="Idioma">
+      <button data-idioma="es" aria-pressed="true">ES</button>
+      <button data-idioma="fr" aria-pressed="false">FR</button>
+      <button data-idioma="en" aria-pressed="false">EN</button>
+    </div>
+  </header>
+
+  <div class="plazas">
+    <span class="punto" id="punto"></span>
+    <span id="plazas-texto">15 plazas disponibles</span>
+  </div>
+
+  <!-- ─────────────  FORMULARIO  ───────────── -->
+  <form class="tarjeta" id="form" novalidate>
+    <label for="personas" data-i18n="personas">Número de personas</label>
+    <select id="personas" name="personas" required></select>
+
+    <div class="fila">
+      <div>
+        <label for="nombre" data-i18n="nombre">Nombre</label>
+        <input id="nombre" name="nombre" autocomplete="given-name" required>
+      </div>
+      <div>
+        <label for="apellidos" data-i18n="apellidos">Apellidos</label>
+        <input id="apellidos" name="apellidos" autocomplete="family-name" required>
+      </div>
+    </div>
+
+    <label for="email" data-i18n="email">Email</label>
+    <input id="email" name="email" type="email" autocomplete="email" required>
+
+    <label for="telefono" data-i18n="telefono">Teléfono / WhatsApp</label>
+    <input id="telefono" name="telefono" type="tel" autocomplete="tel" inputmode="tel" required>
+
+    <label for="alergias" data-i18n="alergias">Alergias o intolerancias</label>
+    <textarea id="alergias" name="alergias" data-i18n-placeholder="alergias_ph"
+      placeholder="Ej.: frutos secos, gluten, lactosa, vegetariano… Déjalo vacío si no hay ninguna."></textarea>
+    <div class="ayuda" data-i18n="alergias_ayuda">Nos importa de verdad: lo pasamos a cocina antes del evento.</div>
+
+    <div class="total">
+      <span data-i18n="total">Total a pagar</span>
+      <span>
+        <span class="cifra" id="cifra">350 MAD</span>
+        <span class="eur" id="cifra-eur">≈ 32 €</span>
+      </span>
+    </div>
+
+    <button class="boton" type="submit" id="enviar" data-i18n="reservar">Reservar y pagar</button>
+    <div class="error-msg oculto" id="error"></div>
+    <p class="nota" data-i18n="nota_form">Al enviar, te mostraremos el QR para pagar. La plaza queda confirmada cuando llegue el pago.</p>
+  </form>
+
+  <!-- ─────────────  PANTALLA DE PAGO  ───────────── -->
+  <section class="tarjeta pago oculto" id="pago">
+    <h2 data-i18n="casi">¡Ya casi!</h2>
+    <p data-i18n="casi_sub" style="color:rgba(248,241,230,.7);font-size:.95rem">
+      Paga la señal con el QR y tu plaza queda reservada.
+    </p>
+
+    <div class="importe" id="importe-pago">350 MAD</div>
+    <div class="importe-eur" id="importe-eur">≈ 32 €</div>
+
+    <div class="vias" role="tablist" aria-label="Método de pago">
+      <button class="via activa" type="button" data-via="revolut" role="tab" aria-selected="true">Revolut</button>
+      <button class="via" type="button" data-via="paypal" role="tab" aria-selected="false">PayPal</button>
+    </div>
+
+    <div id="bloque-revolut">
+      <div class="moneda-nota" data-i18n="moneda_mad">Importe en dírhams (MAD)</div>
+      <div class="qr-caja">
+        <img id="qr-pago" src="revolut-qr.png" alt="QR de pago Revolut de Kinomori" width="220" height="220">
+      </div>
+      <div>
+        <a class="enlace-pago" id="enlace-pago" href="#" target="_blank" rel="noopener">
+          Pagar con Revolut
+        </a>
+      </div>
+    </div>
+
+    <div id="bloque-paypal" class="oculto">
+      <div class="moneda-nota" data-i18n="moneda_eur">PayPal no acepta dírhams: se paga en euros</div>
+      <div class="importe" id="importe-pp">32,41 €</div>
+      <div class="importe-eur" id="importe-pp-mad">≈ 350 MAD</div>
+      <div class="qr-caja">
+        <img id="qr-pp" src="paypal-qr.png" alt="QR de pago PayPal de Kinomori" width="220" height="220">
+      </div>
+      <div>
+        <a class="enlace-pago" id="enlace-pp" href="#" target="_blank" rel="noopener">
+          Pagar con PayPal
+        </a>
+      </div>
+    </div>
+
+    <div class="pasos">
+      <ol>
+        <li data-i18n="p1">Abre Revolut y escanea el QR (o pulsa el botón).</li>
+        <li data-i18n="p2">Escribe <strong>exactamente</strong> el importe que ves arriba.</li>
+        <li data-i18n="p3">En el concepto pon tu nombre y apellidos.</li>
+        <li data-i18n="p4">Mándanos el resguardo por WhatsApp y quedas confirmado.</li>
+      </ol>
+    </div>
+
+    <a class="enlace-pago" id="wa" href="#" target="_blank" rel="noopener" style="margin-top:18px"
+       data-i18n="enviar_resguardo">Enviar resguardo por WhatsApp</a>
+
+    <div class="aviso" data-i18n="aviso_pago">
+      Las plazas se guardan por orden de pago. Te escribimos si algo no cuadra.
+    </div>
+  </section>
+
+  <footer>Kinomori · Tamraght, Marruecos</footer>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   CONFIGURACIÓN — cambia SOLO estas líneas
+   ══════════════════════════════════════════════════════════════ */
+const CONFIG = {
+  // Fecha y hora del evento (texto libre, se muestra tal cual)
+  fechaTexto: { es: "Domingo 29 de noviembre · 19:30", fr: "Dimanche 29 novembre · 19h30", en: "Sunday, November 29 · 7:30 PM" },
+
+  // Precio: "por_persona" (350 x personas) o "total_fijo" (350 siempre)
+  modoPrecio: "por_persona",
+  precio: 350,                 // en MAD
+  moneda: "MAD",
+  eurPorMad: 0.0926,           // solo para el equivalente aproximado en euros
+
+  // Aforo
+  plazasTotales: 15,
+  maxPersonasPorReserva: 6,
+
+  // Pago
+  revolutLink: "https://revolut.me/carlosgzlz",
+  paypalMe: "daftcharly",      // paypal.me/daftcharly
+  paypalEmail: "daftcharly@gmail.com",
+  whatsapp: "34620467051",     // formato internacional SIN + ni espacios (ahora: móvil de Carlos)
+  emailContacto: "carlosgonzvali@gmail.com",
+
+  // Endpoint de reservas (Apps Script). Vacío = no envía, solo muestra el pago.
+  endpoint: ""
+};
+
+/* ── textos ── */
+const T = {
+  es:{personas:"Número de personas",nombre:"Nombre",apellidos:"Apellidos",email:"Email",
+      telefono:"Teléfono / WhatsApp",alergias:"Alergias o intolerancias",
+      alergias_ph:"Ej.: frutos secos, gluten, lactosa, vegetariano… Déjalo vacío si no hay ninguna.",
+      alergias_ayuda:"Nos importa de verdad: lo pasamos a cocina antes del evento.",
+      total:"Total a pagar",reservar:"Reservar y pagar",
+      nota_form:"Al enviar, te mostraremos el QR para pagar. La plaza queda confirmada cuando llegue el pago.",
+      casi:"¡Ya casi!",casi_sub:"Paga con el QR y tu plaza queda reservada.",
+      p1:"Abre Revolut y escanea el QR (o pulsa el botón).",
+      p2:"Escribe <strong>exactamente</strong> el importe que ves arriba.",
+      p3:"En el concepto pon tu nombre y apellidos.",
+      p4:"Mándanos el resguardo por WhatsApp y quedas confirmado.",
+      enviar_resguardo:"Enviar resguardo por WhatsApp",
+      aviso_pago:"Las plazas se guardan por orden de pago. Te escribimos si algo no cuadra.",
+      moneda_mad:"Importe en dírhams (MAD)",moneda_eur:"PayPal no acepta dírhams: se paga en euros",
+      plazas_libres:"{n} plazas disponibles",plaza_libre:"1 plaza disponible",agotado:"Aforo completo",
+      falto:"Rellena todos los campos obligatorios.", bademail:"Revisa el email.",
+      enviando:"Enviando…", fallo:"No se pudo enviar la reserva. Escríbenos por WhatsApp."},
+  fr:{personas:"Nombre de personnes",nombre:"Prénom",apellidos:"Nom",email:"E-mail",
+      telefono:"Téléphone / WhatsApp",alergias:"Allergies ou intolérances",
+      alergias_ph:"Ex. : fruits à coque, gluten, lactose, végétarien… Laissez vide si aucune.",
+      alergias_ayuda:"C'est important pour nous : transmis en cuisine avant l'événement.",
+      total:"Total à payer",reservar:"Réserver et payer",
+      nota_form:"Après l'envoi, le QR de paiement s'affiche. La place est confirmée à réception du paiement.",
+      casi:"Presque fini !",casi_sub:"Payez avec le QR et votre place est réservée.",
+      p1:"Ouvrez Revolut et scannez le QR (ou appuyez sur le bouton).",
+      p2:"Saisissez <strong>exactement</strong> le montant indiqué ci-dessus.",
+      p3:"Dans le motif, mettez votre prénom et nom.",
+      p4:"Envoyez-nous le reçu par WhatsApp et vous êtes confirmé.",
+      enviar_resguardo:"Envoyer le reçu par WhatsApp",
+      aviso_pago:"Les places sont attribuées par ordre de paiement.",
+      moneda_mad:"Montant en dirhams (MAD)",moneda_eur:"PayPal n'accepte pas les dirhams : paiement en euros",
+      plazas_libres:"{n} places disponibles",plaza_libre:"1 place disponible",agotado:"Complet",
+      falto:"Merci de remplir tous les champs obligatoires.", bademail:"Vérifiez l'e-mail.",
+      enviando:"Envoi…", fallo:"Échec de l'envoi. Écrivez-nous sur WhatsApp."},
+  en:{personas:"Number of guests",nombre:"First name",apellidos:"Last name",email:"Email",
+      telefono:"Phone / WhatsApp",alergias:"Allergies or intolerances",
+      alergias_ph:"E.g. nuts, gluten, lactose, vegetarian… Leave empty if none.",
+      alergias_ayuda:"We take this seriously: it goes to the kitchen before the event.",
+      total:"Total to pay",reservar:"Reserve and pay",
+      nota_form:"After submitting we show you the payment QR. Your seat is confirmed once payment arrives.",
+      casi:"Almost there!",casi_sub:"Pay with the QR and your seat is booked.",
+      p1:"Open Revolut and scan the QR (or tap the button).",
+      p2:"Enter <strong>exactly</strong> the amount shown above.",
+      p3:"In the reference put your first and last name.",
+      p4:"Send us the receipt on WhatsApp and you're confirmed.",
+      enviar_resguardo:"Send receipt on WhatsApp",
+      aviso_pago:"Seats are held in order of payment. We'll message you if anything is off.",
+      moneda_mad:"Amount in dirhams (MAD)",moneda_eur:"PayPal doesn't accept dirhams: you pay in euros",
+      plazas_libres:"{n} seats left",plaza_libre:"1 seat left",agotado:"Sold out",
+      falto:"Please fill in all required fields.", bademail:"Check the email.",
+      enviando:"Sending…", fallo:"Could not send. Message us on WhatsApp."}
+};
+
+let idioma = (navigator.language || "es").slice(0,2);
+if(!T[idioma]) idioma = "es";
+
+const $ = s => document.querySelector(s);
+const importe = () => CONFIG.modoPrecio === "total_fijo"
+  ? CONFIG.precio
+  : CONFIG.precio * parseInt($("#personas").value || "1", 10);
+
+function pintaIdioma(){
+  const t = T[idioma];
+  document.documentElement.lang = idioma;
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    const k = el.dataset.i18n; if(t[k]) el.innerHTML = t[k];
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{
+    const k = el.dataset.i18nPlaceholder; if(t[k]) el.placeholder = t[k];
+  });
+  document.querySelectorAll(".idiomas button").forEach(b=>{
+    b.setAttribute("aria-pressed", b.dataset.idioma === idioma ? "true" : "false");
+  });
+  $("#fecha").textContent = CONFIG.fechaTexto[idioma] || CONFIG.fechaTexto.es;
+  pintaPlazas(); pintaImporte();
+}
+
+const fmtEur = v => v.toFixed(2).replace(".", ",") + " €";
+const eurDe = mad => Math.ceil(mad * CONFIG.eurPorMad * 100) / 100;   // redondeo hacia arriba
+
+function pintaImporte(){
+  const mad = importe();
+  const eur = eurDe(mad);
+  $("#cifra").textContent = mad + " " + CONFIG.moneda;
+  $("#cifra-eur").textContent = "≈ " + fmtEur(eur);
+  // Revolut: en dírhams
+  $("#importe-pago").textContent = mad + " " + CONFIG.moneda;
+  $("#importe-eur").textContent = "≈ " + fmtEur(eur);
+  $("#enlace-pago").href = CONFIG.revolutLink;
+  // PayPal: en euros (no acepta MAD)
+  $("#importe-pp").textContent = fmtEur(eur);
+  $("#importe-pp-mad").textContent = "≈ " + mad + " " + CONFIG.moneda;
+  $("#enlace-pp").href = CONFIG.paypalMe
+    ? "https://www.paypal.com/paypalme/" + CONFIG.paypalMe + "/" + eur.toFixed(2) + "EUR"
+    : "#";
+}
+
+function pintaPlazas(){
+  const t = T[idioma];
+  const libres = Math.max(0, CONFIG.plazasTotales - (window.__reservadas || 0));
+  $("#plazas-texto").textContent = libres === 0 ? t.agotado
+    : libres === 1 ? t.plaza_libre : t.plazas_libres.replace("{n}", libres);
+  $("#punto").classList.toggle("agotado", libres === 0);
+  if(libres === 0){ $("#form").classList.add("oculto"); }
+}
+
+/* ── arranque ── */
+(function init(){
+  const sel = $("#personas");
+  const libres = CONFIG.plazasTotales - (window.__reservadas || 0);
+  const tope = Math.max(1, Math.min(CONFIG.maxPersonasPorReserva, libres));
+  for(let i = 1; i <= tope; i++){
+    const o = document.createElement("option");
+    o.value = i; o.textContent = i + (i === 1 ? "" : " ×");
+    sel.appendChild(o);
+  }
+  sel.addEventListener("change", pintaImporte);
+  document.querySelectorAll(".idiomas button").forEach(b=>{
+    b.addEventListener("click", ()=>{ idioma = b.dataset.idioma; pintaIdioma(); });
+  });
+  document.querySelectorAll(".via").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      document.querySelectorAll(".via").forEach(x=>{
+        x.classList.toggle("activa", x === b);
+        x.setAttribute("aria-selected", x === b ? "true" : "false");
+      });
+      $("#bloque-revolut").classList.toggle("oculto", b.dataset.via !== "revolut");
+      $("#bloque-paypal").classList.toggle("oculto", b.dataset.via !== "paypal");
+    });
+  });
+  pintaIdioma();
+  // disponibilidad real si hay endpoint
+  if(CONFIG.endpoint){
+    fetch(CONFIG.endpoint + "?accion=plazas").then(r=>r.json())
+      .then(d=>{ if(typeof d.reservadas === "number"){ window.__reservadas = d.reservadas;
+        const l = CONFIG.plazasTotales - d.reservadas;
+        const tope2 = Math.max(1, Math.min(CONFIG.maxPersonasPorReserva, l));
+        sel.innerHTML = ""; for(let i=1;i<=tope2;i++){ const o=document.createElement("option");
+          o.value=i; o.textContent=i+(i===1?"":" ×"); sel.appendChild(o); }
+        pintaPlazas(); pintaImporte(); }})
+      .catch(()=>{});
+  }
+})();
+
+/* ── envío ── */
+$("#form").addEventListener("submit", async e=>{
+  e.preventDefault();
+  const t = T[idioma];
+  const datos = {
+    personas: $("#personas").value, nombre: $("#nombre").value.trim(),
+    apellidos: $("#apellidos").value.trim(), email: $("#email").value.trim(),
+    telefono: $("#telefono").value.trim(), alergias: $("#alergias").value.trim(),
+    importe: importe(), idioma, evento: "cena-especial"
+  };
+  const err = $("#error");
+  if(!datos.nombre || !datos.apellidos || !datos.email || !datos.telefono){
+    err.textContent = t.falto; err.classList.remove("oculto"); return;
+  }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(datos.email)){
+    err.textContent = t.bademail; err.classList.remove("oculto"); return;
+  }
+  err.classList.add("oculto");
+  const btn = $("#enviar");
+  btn.disabled = true; btn.textContent = t.enviando;
+
+  if(CONFIG.endpoint){
+    try{
+      await fetch(CONFIG.endpoint, {
+        method:"POST", mode:"no-cors",
+        headers:{"Content-Type":"text/plain;charset=utf-8"},
+        body: JSON.stringify(datos)
+      });
+    }catch(_){ /* no-cors no da error legible: seguimos */ }
+  }
+
+  // mensaje de WhatsApp con todo pre-rellenado
+  const texto = `Reserva Kinomori — ${datos.nombre} ${datos.apellidos} · ${datos.personas} pers. · ${datos.importe} ${CONFIG.moneda}`
+    + (datos.alergias ? ` · Alergias: ${datos.alergias}` : "");
+  $("#wa").href = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(texto)}`;
+
+  $("#form").classList.add("oculto");
+  $("#pago").classList.remove("oculto");
+  btn.disabled = false; btn.textContent = t.reservar;
+  window.scrollTo({top:0, behavior:"smooth"});
+});
+</script>
+</body>
+</html>
