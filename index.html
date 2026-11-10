@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kinomori · Autumn Table — Reserva</title>
-<meta name="description" content="Autumn Table · Mesa de otoño en Kinomori. Aforo limitado, reserva tu plaza.">
-<meta property="og:title" content="Kinomori · Autumn Table">
-<meta property="og:description" content="Autumn Table · Mesa de otoño. Aforo limitado: reserva tu plaza y confirma con el pago.">
+<title>Kinomori · The Autumn Table — Reserva</title>
+<meta name="description" content="The Autumn Table at Kinomori. Limited seats — book yours.">
+<meta property="og:title" content="Kinomori · The Autumn Table">
+<meta property="og:description" content="The Autumn Table at Kinomori. Limited seats — book yours and confirm with payment.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2314100c'/%3E%3Ctext x='16' y='23' font-size='18' text-anchor='middle' fill='%23ff7a3d' font-family='Georgia'%3EK%3C/text%3E%3C/svg%3E">
 <style>
@@ -125,7 +125,7 @@
 
   <header>
     <div class="marca">Kinomori · Tamraght</div>
-    <h1 id="titulo">Autumn <em>Table</em></h1>
+    <h1 id="titulo">The Autumn <em>Table</em></h1>
     <div class="subtitulo" id="subtitulo"></div>
     <div class="fecha" id="fecha"></div>
     <div class="idiomas" role="group" aria-label="Idioma">
@@ -280,7 +280,7 @@ const CONFIG = {
 
 /* ── textos ── */
 const T = {
-  es:{subtitulo:"Mesa de otoño",personas:"Número de personas",nombre:"Nombre",apellidos:"Apellidos",email:"Email",
+  es:{subtitulo:"La mesa de otoño",personas:"Número de personas",nombre:"Nombre",apellidos:"Apellidos",email:"Email",
       telefono:"Teléfono / WhatsApp",alergias:"Alergias o intolerancias",
       alergias_ph:"Ej.: frutos secos, gluten, lactosa, vegetariano… Déjalo vacío si no hay ninguna.",
       alergias_ayuda:"Nos importa de verdad: lo pasamos a cocina antes del evento.",
@@ -299,7 +299,7 @@ const T = {
       telmalo:"El teléfono no es válido para {p}: deben ser {n} dígitos.",
       persona_n:"Persona {n} — nombre y apellidos",nombre_ph:"Nombre y apellidos",
       enviando:"Enviando…", fallo:"No se pudo enviar la reserva. Escríbenos por WhatsApp."},
-  fr:{subtitulo:"Table d'automne",personas:"Nombre de personnes",nombre:"Prénom",apellidos:"Nom",email:"E-mail",
+  fr:{subtitulo:"La table d'automne",personas:"Nombre de personnes",nombre:"Prénom",apellidos:"Nom",email:"E-mail",
       telefono:"Téléphone / WhatsApp",alergias:"Allergies ou intolérances",
       alergias_ph:"Ex. : fruits à coque, gluten, lactose, végétarien… Laissez vide si aucune.",
       alergias_ayuda:"C'est important pour nous : transmis en cuisine avant l'événement.",
@@ -339,8 +339,7 @@ const T = {
       enviando:"Sending…", fallo:"Could not send. Message us on WhatsApp."}
 };
 
-let idioma = (navigator.language || "es").slice(0,2);
-if(!T[idioma]) idioma = "es";
+let idioma = "en";   // inglés por defecto
 
 const $ = s => document.querySelector(s);
 const importe = () => CONFIG.modoPrecio === "total_fijo"
