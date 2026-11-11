@@ -72,10 +72,25 @@
   .menu-cab{text-align:center;margin-bottom:24px}
   .menu-cab h2{font-size:1.9rem;letter-spacing:.26em;color:#c1440e;font-weight:400;margin-bottom:8px}
   .menu-cab p{font-size:.74rem;letter-spacing:.15em;text-transform:uppercase;color:#8a6a52;line-height:1.6}
-  .menu-foto{
-    display:block;width:100%;height:auto;max-height:270px;object-fit:cover;
-    border-radius:12px;margin:0 0 24px;box-shadow:0 6px 18px rgba(58,42,28,.18)
+  .modal-carta{padding:34px 16px 22px;max-width:700px}
+  .poster-enlace{display:block;line-height:0;border-radius:12px;overflow:hidden;
+    box-shadow:0 8px 26px rgba(58,42,28,.22)}
+  /* la carta entera, sin recortar: se ve la foto y la tipografía original */
+  .menu-poster{display:block;width:100%;height:auto;border-radius:12px}
+  .poster-pie{
+    margin:12px 0 0;text-align:center;font-size:.74rem;letter-spacing:.06em;color:#8a6a52
   }
+  .menu-texto{
+    margin-top:20px;padding-top:16px;border-top:1px solid rgba(58,42,28,.16)
+  }
+  .menu-texto summary{
+    cursor:pointer;text-align:center;font-size:.85rem;color:#8a6a52;
+    letter-spacing:.05em;list-style:none
+  }
+  .menu-texto summary::-webkit-details-marker{display:none}
+  .menu-texto summary:before{content:"▾ "}
+  .menu-texto[open] summary:before{content:"▴ "}
+  .menu-texto > div{margin-top:18px}
   .menu-sec{text-align:center;margin-bottom:21px}
   .menu-sec .zh{font-family:var(--jp);font-size:1.02rem;color:#c1440e;letter-spacing:.14em;margin-bottom:3px}
   .menu-sec .t{font-size:1.03rem;color:#3a2a1c;line-height:1.35}
@@ -180,17 +195,18 @@
 
   <!-- ─────────────  POPUP DEL MENÚ  ───────────── -->
   <div class="modal oculto" id="menu-modal" role="dialog" aria-modal="true" aria-labelledby="menu-h2">
-    <div class="modal-caja">
+    <div class="modal-caja modal-carta">
       <button class="cerrar" type="button" id="menu-cerrar" aria-label="Close">×</button>
-      <div class="menu-cab">
-        <h2 id="menu-h2">MENU</h2>
-        <p>The Autumn Table<br>Kinomori x Chimi · Tamraght, Morocco</p>
-      </div>
-      <img class="menu-foto" src="menu-foto.jpg" alt="Kinomori x Chimi — cocina en vivo" width="369" height="490" loading="lazy">
-      <div id="menu-cuerpo"></div>
-      <a class="menu-original" href="menu.jpg" target="_blank" rel="noopener" data-i18n="menu_original">
-        See the original menu card
+      <a class="poster-enlace" href="menu.jpg" target="_blank" rel="noopener" aria-label="Menu">
+        <img class="menu-poster" src="menu.jpg"
+             alt="The Autumn Table — carta de Kinomori x Chimi, Tamraght"
+             width="1024" height="1280" loading="lazy">
       </a>
+      <p class="poster-pie" data-i18n="toca_ampliar">Toca la carta para verla a tamaño completo</p>
+      <details class="menu-texto">
+        <summary data-i18n="menu_traducido">Ver la carta en tu idioma</summary>
+        <div id="menu-cuerpo"></div>
+      </details>
     </div>
   </div>
 
@@ -356,7 +372,7 @@ const T = {
       plazas_libres:"{n} plazas disponibles",plaza_libre:"1 plaza disponible",agotado:"Aforo completo",
       falto:"Rellena todos los campos obligatorios.", bademail:"Revisa el email.",
       telmalo:"El teléfono no es válido para {p}: deben ser {n} dígitos.",
-      ver_menu:"Ver el menú",menu_original:"Ver la carta original",
+      ver_menu:"Ver el menú",menu_original:"Ver la carta original",toca_ampliar:"Toca la carta para verla a tamaño completo",menu_traducido:"Ver la carta en tu idioma",
       persona_n:"Persona {n} — nombre y apellidos",nombre_ph:"Nombre y apellidos",
       enviando:"Enviando…", fallo:"No se pudo enviar la reserva. Escríbenos por WhatsApp."},
   fr:{subtitulo:"La table d'automne",personas:"Nombre de personnes",nombre:"Prénom",apellidos:"Nom",email:"E-mail",
@@ -376,7 +392,7 @@ const T = {
       plazas_libres:"{n} places disponibles",plaza_libre:"1 place disponible",agotado:"Complet",
       falto:"Merci de remplir tous les champs obligatoires.", bademail:"Vérifiez l'e-mail.",
       telmalo:"Numéro invalide pour {p} : {n} chiffres attendus.",
-      ver_menu:"Voir le menu",menu_original:"Voir la carte originale",
+      ver_menu:"Voir le menu",menu_original:"Voir la carte originale",toca_ampliar:"Touchez la carte pour la voir en grand",menu_traducido:"Voir la carte dans votre langue",
       persona_n:"Personne {n} — prénom et nom",nombre_ph:"Prénom et nom",
       enviando:"Envoi…", fallo:"Échec de l'envoi. Écrivez-nous sur WhatsApp."},
   en:{subtitulo:"",personas:"Number of guests",nombre:"First name",apellidos:"Last name",email:"Email",
@@ -396,7 +412,7 @@ const T = {
       plazas_libres:"{n} seats left",plaza_libre:"1 seat left",agotado:"Sold out",
       falto:"Please fill in all required fields.", bademail:"Check the email.",
       telmalo:"Invalid number for {p}: {n} digits expected.",
-      ver_menu:"View the menu",menu_original:"See the original menu card",
+      ver_menu:"View the menu",menu_original:"See the original menu card",toca_ampliar:"Tap the card to see it full size",menu_traducido:"See the menu in your language",
       persona_n:"Guest {n} — full name",nombre_ph:"Full name",
       enviando:"Sending…", fallo:"Could not send. Message us on WhatsApp."}
 };
